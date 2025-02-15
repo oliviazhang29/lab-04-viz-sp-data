@@ -7,7 +7,8 @@ output: github_document
 
 ### Load packages and data
 
-```{r load-packages, message = FALSE}
+
+``` r
 #install.packages("devtools")
 #devtools::install_github("rstudio-education/dsbox")
 
@@ -15,7 +16,8 @@ library(tidyverse)
 library(dsbox) 
 ```
 
-```{r load-data, message = FALSE}
+
+``` r
 states <- read_csv("data/states.csv")
 ```
 
