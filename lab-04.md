@@ -19,42 +19,56 @@ states <- read_csv("data/states.csv")
 
 ### Exercise 1
 
-The Denny’s dataset has 1643 rows and 6 columns/variables.
+The Denny’s dataset has 1643 rows and 6 columns/variables. Each row
+represent a Denny’s location, and the variables are address, city,
+state, zip, longitude, and latitude.
 
 ### Exercise 2
 
-The Quinta’s dataset has 909 rows and 6 columns/variables.
+The La Quinta’s dataset has 909 rows and 6 columns/variables. Each row
+represent a La Quinta’s location, and the variables are address, city,
+state, zip, longitude, and latitude.
 
 ### Exercise 3
 
-There are some La Quinta’s outside of US. They are in countries like
+There are some La Quintas’ outside of US. They are in countries like
 Canada, Mexico, China, New Zealand, Turkey, United Arab Emirates, Chile,
 Colombia, Ecuador. However, I don’t think there’s any Danny’s outside of
 the US.
 
 ### Exercise 4
 
-There are a few ways to determine whether there’s any establishments
-that are not in the US. 1. We can create a new variable called US and
-check weather the state variable in two datasets are the same or
-different from the states dataset. 2. If we know the longitude and
-latitude of the US border, techniquely, we can filter out the
-establishments outside of US.
+There are two ways I can think of to determine whether there’s any
+establishments that are not in the US.
+
+1.  We can create a new variable called US and check weather the state
+    variable in two datasets are the same or different from the
+    abbreviation variable in the states dataset.
+
+2.  If we know the longitude and latitude of all locations on the US
+    border line, techniquely, we can filter out the establishments
+    outside of US.
 
 ### Exercise 5
 
 ``` r
 dn <- dennys %>%
   filter(!(state %in% states$abbreviation))
+dn
 ```
+
+    ## # A tibble: 0 × 6
+    ## # ℹ 6 variables: address <chr>, city <chr>, state <chr>, zip <chr>,
+    ## #   longitude <dbl>, latitude <dbl>
 
 There are 0 Denny’s locations outside the US.
 
 ### Exercise 6
 
 ``` r
-dennys %>%
+dennys <- dennys %>%
   mutate(country = "United States")
+dennys
 ```
 
     ## # A tibble: 1,643 × 7
@@ -123,25 +137,145 @@ laquinta <- laquinta %>%
 ``` r
 dennys %>%
   count(state) %>%
-  inner_join(states, by = c("state" = "abbreviation"))
+  arrange(desc(n))
 ```
 
-    ## # A tibble: 51 × 4
-    ##    state     n name                     area
-    ##    <chr> <int> <chr>                   <dbl>
-    ##  1 AK        3 Alaska               665384. 
-    ##  2 AL        7 Alabama               52420. 
-    ##  3 AR        9 Arkansas              53179. 
-    ##  4 AZ       83 Arizona              113990. 
-    ##  5 CA      403 California           163695. 
-    ##  6 CO       29 Colorado             104094. 
-    ##  7 CT       12 Connecticut            5543. 
-    ##  8 DC        2 District of Columbia     68.3
-    ##  9 DE        1 Delaware               2489. 
-    ## 10 FL      140 Florida               65758. 
+    ## # A tibble: 51 × 2
+    ##    state     n
+    ##    <chr> <int>
+    ##  1 CA      403
+    ##  2 TX      200
+    ##  3 FL      140
+    ##  4 AZ       83
+    ##  5 IL       56
+    ##  6 NY       56
+    ##  7 WA       49
+    ##  8 OH       44
+    ##  9 MO       42
+    ## 10 PA       40
     ## # ℹ 41 more rows
 
+``` r
+dennys %>%
+  count(state) %>%
+  arrange(n)
+```
+
+    ## # A tibble: 51 × 2
+    ##    state     n
+    ##    <chr> <int>
+    ##  1 DE        1
+    ##  2 DC        2
+    ##  3 VT        2
+    ##  4 AK        3
+    ##  5 IA        3
+    ##  6 NH        3
+    ##  7 SD        3
+    ##  8 WV        3
+    ##  9 LA        4
+    ## 10 MT        4
+    ## # ℹ 41 more rows
+
+``` r
+laquinta %>%
+  count(state) %>%
+  arrange(desc(n))
+```
+
+    ## # A tibble: 48 × 2
+    ##    state     n
+    ##    <chr> <int>
+    ##  1 TX      237
+    ##  2 FL       74
+    ##  3 CA       56
+    ##  4 GA       41
+    ##  5 TN       30
+    ##  6 OK       29
+    ##  7 LA       28
+    ##  8 CO       27
+    ##  9 NM       19
+    ## 10 NY       19
+    ## # ℹ 38 more rows
+
+``` r
+laquinta %>%
+  count(state) %>%
+  arrange(n)
+```
+
+    ## # A tibble: 48 × 2
+    ##    state     n
+    ##    <chr> <int>
+    ##  1 ME        1
+    ##  2 AK        2
+    ##  3 NH        2
+    ##  4 RI        2
+    ##  5 SD        2
+    ##  6 VT        2
+    ##  7 WV        3
+    ##  8 WY        3
+    ##  9 IA        4
+    ## 10 MI        4
+    ## # ℹ 38 more rows
+
+California (n = 403) has the most Denny’s locations and Delaware has the
+least (n = 1); Texas (n = 237) has the most La Quinta’s locations and
+Maine has the least (n = 1). Due to my limited knowledge of the US
+demographic, I guess it’s not surprising, since Texas is near Mexico and
+Maine is far north. I’m not sure why the location pattern of Danny’s is
+this way though.
+
+``` r
+dennys %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>% 
+  mutate(per_th_sq_mile = n/area) %>%
+  arrange(desc(per_th_sq_mile))
+```
+
+    ## # A tibble: 51 × 5
+    ##    state     n name                     area per_th_sq_mile
+    ##    <chr> <int> <chr>                   <dbl>          <dbl>
+    ##  1 DC        2 District of Columbia     68.3       0.0293  
+    ##  2 RI        5 Rhode Island           1545.        0.00324 
+    ##  3 CA      403 California           163695.        0.00246 
+    ##  4 CT       12 Connecticut            5543.        0.00216 
+    ##  5 FL      140 Florida               65758.        0.00213 
+    ##  6 MD       26 Maryland              12406.        0.00210 
+    ##  7 NJ       10 New Jersey             8723.        0.00115 
+    ##  8 NY       56 New York              54555.        0.00103 
+    ##  9 IN       37 Indiana               36420.        0.00102 
+    ## 10 OH       44 Ohio                  44826.        0.000982
+    ## # ℹ 41 more rows
+
+``` r
+laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  mutate(per_th_sq_mile = n/area) %>%
+  arrange(desc(per_th_sq_mile))
+```
+
+    ## # A tibble: 48 × 5
+    ##    state     n name             area per_th_sq_mile
+    ##    <chr> <int> <chr>           <dbl>          <dbl>
+    ##  1 RI        2 Rhode Island    1545.       0.00129 
+    ##  2 FL       74 Florida        65758.       0.00113 
+    ##  3 CT        6 Connecticut     5543.       0.00108 
+    ##  4 MD       13 Maryland       12406.       0.00105 
+    ##  5 TX      237 Texas         268596.       0.000882
+    ##  6 TN       30 Tennessee      42144.       0.000712
+    ##  7 GA       41 Georgia        59425.       0.000690
+    ##  8 NJ        5 New Jersey      8723.       0.000573
+    ##  9 MA        6 Massachusetts  10554.       0.000568
+    ## 10 LA       28 Louisiana      52378.       0.000535
+    ## # ℹ 38 more rows
+
 ### Exercise 10
+
+District of Columbia has the most Denny’s locations per thousand square
+miles, and Rhode Island has the most La Quinta’s locations per thousand
+square miles.
 
 ``` r
 dennys <- dennys %>%
@@ -185,9 +319,11 @@ dn_lq %>%
      )
 ```
 
-![](lab-04_files/figure-gfm/plot-nc-1.png)<!-- --> Mitch Hedberg’s joke
-mostly hold in North Carolina except for a few La Quintas on the upper
-left corner of the plot, which are distant from their nearest Denny’s.
+![](lab-04_files/figure-gfm/plot-nc-1.png)<!-- -->
+
+Mitch Hedberg’s joke mostly hold in North Carolina except for a few La
+Quintas on the upper left corner of the plot, which are distant from
+their nearest Denny’s.
 
 ### Exercise 12
 
@@ -209,7 +345,9 @@ dn_lq %>%
      )
 ```
 
-![](lab-04_files/figure-gfm/plot-tx-1.png)<!-- --> Mitch Hedberg’s joke
-seems to hold less in Texas, since there are more La Quintas than
-Denny’s, and not all La Quinta has a Denny’s next to it. However, all
-Denny’s are near La Quintas.
+![](lab-04_files/figure-gfm/plot-tx-1.png)<!-- -->
+
+Mitch Hedberg’s joke seems to hold less in Texas, since there are more
+La Quintas than Denny’s, and not all La Quinta has a Denny’s next to it.
+However, all Denny’s are near La Quintas. Maybe in Texas, Denny’s is the
+English for “next to La Quinta”!

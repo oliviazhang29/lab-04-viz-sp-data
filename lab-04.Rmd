@@ -36,9 +36,11 @@ I don't think there's any Danny's outside of the US.
 ### Exercise 4
 
 There are two ways I can think of to determine whether there's any establishments that are not in the US. 
+
 1. We can create a new variable called US and check weather the state variable in two datasets 
-are the same or different from the abbreviation variable from the states dataset. 
-2. If we know the longitude and latitude of the US border, techniquely, we can filter out the 
+are the same or different from the abbreviation variable in the states dataset. 
+
+2. If we know the longitude and latitude of all locations on the US border line, techniquely, we can filter out the 
 establishments outside of US. 
 
 ### Exercise 5
@@ -92,31 +94,37 @@ dennys %>%
   count(state) %>%
   arrange(desc(n))
 
+dennys %>%
+  count(state) %>%
+  arrange(n)
+
 laquinta %>%
   count(state) %>%
   arrange(desc(n))
-```
-California (n = 403) has the most Denny's locations and Delaware has the least (n = 1); Texas (n = 237) has the most La Quinta's locations and Maine has the least (n = 1). Due to my limited knowledge of the US demographic, I guess it's not surprising, since Texas is near Mexico and Maine is far north. I'm not sure why the location pattern of Danny's is this way though.
-
-```{r join}
-dennys %>%
-  count(state) %>%
-  inner_join(states, by = c("state" = "abbreviation"))
 
 laquinta %>%
   count(state) %>%
-  inner_join(states, by = c("state" = "abbreviation"))
+  arrange(n)
+```
+California (n = 403) has the most Denny's locations and Delaware has the least (n = 1); Texas (n = 237) has the most La Quinta's locations and Maine has the least (n = 1). Due to my limited knowledge of the US demographic, I guess it's not surprising, since Texas is near Mexico and Maine is far north. I'm not sure why the location pattern of Danny's is this way though.
+
+```{r cal-ptsq}
+dennys %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>% 
+  mutate(per_th_sq_mile = n/area) %>%
+  arrange(desc(per_th_sq_mile))
+
+laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation")) %>%
+  mutate(per_th_sq_mile = n/area) %>%
+  arrange(desc(per_th_sq_mile))
 ```
 
 ### Exercise 10
 
-```{r cal-ptsm}
-dennys <- dennys %>%
-  mutate(per_th_sq_mile = )
-laquinta <- laquinta %>%
-  mutate(establishment = "La Quinta")
-```
-
+District of Columbia has the most Denny's locations per thousand square miles, and Rhode Island has the most La Quinta's locations per thousand square miles. 
 
 ```{r set-id}
 dennys <- dennys %>%
@@ -157,6 +165,7 @@ dn_lq %>%
   color = "Establishment"
      )
 ```
+
 Mitch Hedberg’s joke mostly hold in North Carolina except for a few La Quintas on the upper left corner of the plot, which are distant from their nearest Denny's. 
 
 ### Exercise 12
@@ -178,4 +187,5 @@ dn_lq %>%
   color = "Establishment"
      )
 ```
-Mitch Hedberg’s joke seems to hold less in Texas, since there are more La Quintas than Denny's, and not all La Quinta has a Denny's next to it. However, all Denny's are near La Quintas.
+
+Mitch Hedberg’s joke seems to hold less in Texas, since there are more La Quintas than Denny's, and not all La Quinta has a Denny's next to it. However, all Denny's are near La Quintas. Maybe in Texas, Denny's is the English for "next to La Quinta"!
